@@ -1,13 +1,9 @@
-/*
-Original prompt:
-https://www.reddit.com/r/dailyprogrammer/comments/13m4bz1/20230519_challenge_400_intermediate_practical/
+// Ref: https://www.reddit.com/r/dailyprogrammer/comments/13m4bz1/20230519_challenge_400_intermediate_practical/
 
-Here's a good naive approach by someone in the comments:
-https://github.com/cbarrick/practice/blob/master/reddit/dailyprogrammer/400-med/practical.rs
-
-Fun terrifying multithreaded solution by someone else in the comments:
-https://github.com/skeeto/scratch/blob/master/misc/practical.c
-*/
+// Here's a good naive approach by someone in the comments:
+// https://github.com/cbarrick/practice/blob/master/reddit/dailyprogrammer/400-med/practical.rs
+// Fun terrifying multithreaded solution by someone else in the comments:
+// https://github.com/skeeto/scratch/blob/master/misc/practical.c
 
 use prime_factorization::Factorization;
 use std::time::Instant;
