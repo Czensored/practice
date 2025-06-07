@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "caesar-cipher"
+name = "upc-check-digits"
 version = "0.1.0"

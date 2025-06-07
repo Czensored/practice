@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "caesar-cipher"
+name = "pancake-sort"
 version = "0.1.0"

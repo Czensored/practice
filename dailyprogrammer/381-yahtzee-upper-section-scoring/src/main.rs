@@ -24,11 +24,8 @@ fn main() {
     println!("{}", yahtzee_upper(vec![1, 1, 1, 3, 3])); // 6
     println!("{}", yahtzee_upper(vec![1, 2, 3, 4, 5])); // 5
     println!("{}", yahtzee_upper(vec![6, 6, 6, 6, 6])); // 30
-    println!(
-        "{}",
-        yahtzee_upper(vec![
+    println!("{}", yahtzee_upper(vec![
             1654, 1654, 50995, 30864, 1654, 50995, 22747, 1654, 1654, 1654, 1654, 1654, 30864,
             4868, 1654, 4868, 1654, 30864, 4868, 30864
-        ])
-    ); // 123456
+        ])); // 123456
 }

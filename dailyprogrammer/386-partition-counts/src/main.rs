@@ -5,7 +5,14 @@ use num_bigint::BigUint;
 use num_traits::{One, Zero};
 
 fn p(n: usize) -> BigUint {
-    let mut partitions = vec![Bi];
+    let mut partitions = vec![BigUint::one()];
+
+    for i in 1..=n {
+        let mut sum = BigUint::zero();
+        let mut k = 1;
+    }
+
+    partitions[n].clone()
 }
 
 fn main() {
@@ -13,3 +20,4 @@ fn main() {
     let result = p(n);
     println!("{}", result);
 }
+
