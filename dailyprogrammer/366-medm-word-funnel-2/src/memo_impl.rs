@@ -1,4 +1,5 @@
 // Memoized version is generated via ChatGPT after inputting my code and asking for optimization
+// It's faster to use the same memo for every word, but I think that that's an unfair comparison
 
 use std::collections::{HashMap, HashSet};
 
@@ -27,14 +28,13 @@ fn funnel2_helper_memo(
 pub fn funnel2_memo(
     s: &str,
     word_list: &HashSet<String>,
-    memo: &mut HashMap<String, usize>,
 ) -> usize {
     assert!(s.is_ascii(), "Input must be ASCII");
-    1 + funnel2_helper_memo(&s.to_string(), &word_list, memo)
+    let mut memo = HashMap::new();
+    1 + funnel2_helper_memo(&s.to_string(), &word_list, &mut memo)
 }
 
 pub fn run_with_memoization(word_list: &HashSet<String>) {
-    let mut memo = HashMap::new();
 
     for word in [
         "gnash",
@@ -43,13 +43,13 @@ pub fn run_with_memoization(word_list: &HashSet<String>) {
         "implosive",
         "programmer",
     ] {
-        let result = funnel2_memo(word, &word_list, &mut memo);
+        let result = funnel2_memo(word, &word_list);
         println!("{} → {}", word, result);
     }
 
     // Optional bonus 1:
     for i in word_list {
-        if funnel2_memo(&i, word_list, &mut memo) == 10 {
+        if funnel2_memo(&i, word_list) == 10 {
             println!("length 10 word is: {}", i);
         }
     }

@@ -15,6 +15,10 @@ fn p(n: usize) -> BigUint {
     partitions[n].clone()
 }
 
+fn digit_sum(n: BigUint) -> u32 {
+    n.to_str_radix(10).chars().map(|c| c.to_digit(10).unwrap()).sum()
+}
+
 fn main() {
     let n = 66;
     let result = p(n);

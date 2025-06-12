@@ -1,0 +1,10 @@
+[package]
+name = "nearest-prime-numbers"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+lazy_static = "1.5.0"
+num-bigint = { version = "0.4.6", features = ["rand"] }
+num-traits = "0.2.19"
+rand = "0.8"

@@ -1,32 +1,57 @@
 // Ref: https://www.reddit.com/r/dailyprogrammer/comments/neg49j/20210517_challenge_390_difficult_number_of_1s/
-// In Progress
 
-fn how_many_ones_brute_force(n: usize) -> usize {
-    let mut count = 0;
-    for i in 1..=n {
-        let mut x = i;
-        while x > 0 {
-            if x % 10 == 1 {
-                count += 1;
+use num_bigint::BigUint;
+use num_traits::{One, Zero};
+
+#[allow(dead_code)]
+fn how_many_ones_brute_force(n: BigUint) -> BigUint {
+    let mut count = BigUint::zero();
+    let one = BigUint::one();
+    let ten = BigUint::from(10u32);
+
+    let mut i = one.clone();
+    while &i <= &n {
+        let mut x = i.clone();
+        while x > BigUint::zero() {
+            if &x % &ten == one {
+                count += &one;
             }
-            x /= 10;
+            x /= &ten;
         }
+        i += &one;
     }
+
     count
 }
 
-fn how_many_ones(mut n: usize) -> usize {
-    let mut sum = 0;
-    let mut place = 1;
+fn how_many_ones(n: &BigUint) -> BigUint {
+    let mut sum = BigUint::zero();
+    let mut place = BigUint::one();
+    let ten = BigUint::from(10u32);
 
-    while n > 0 {
-        place *= 10;
+    while &place <= n {
+        let right = n % (&ten * &place);
+        let left = n / (&ten * &place);
+
+        // Emulate saturating_sub: max(right - (place - 1), 0)
+        let subtrahend = &place - BigUint::one();
+        let diff = if right > subtrahend {
+            right.clone() - subtrahend
+        } else {
+            BigUint::zero()
+        };
+
+        let min_val = place.clone().min(diff);
+        sum += left * &place + min_val;
+
+        place *= &ten;
     }
 
-    return 0;
+    sum
 }
 
 fn main() {
-    let n = 111;
-    println!("{}", how_many_ones_brute_force(n));
+    let base = BigUint::from(3u32);
+    let n = base.pow(35);
+    println!("{}", how_many_ones(&n));
 }

@@ -1,9 +1,9 @@
 // Ref: https://www.reddit.com/r/dailyprogrammer/comments/nzmvsj/20210614_challenge_394_difficult_rsa_encryption/
 // This algorithm is not actually cryptographically secure, I did not use secure rng
 
-use num_bigint::{BigUint, RandBigInt, BigInt, ToBigInt};
-use num_traits::{Zero, One};
+use num_bigint::{BigInt, BigUint, RandBigInt, ToBigInt};
 use num_integer::Integer;
+use num_traits::{One, Zero};
 use rand::thread_rng;
 use std::mem;
 
@@ -36,11 +36,14 @@ fn generate_prime() -> BigUint {
         let candidate = rng.gen_biguint_range(&lower, &upper);
         // let candidate = rng.gen_biguint(256);
 
-        if small_primes.iter().any(|p| &candidate % p == BigUint::zero()) {
+        if small_primes
+            .iter()
+            .any(|p| &candidate % p == BigUint::zero())
+        {
             continue;
         }
 
-        // Simple probabilistic primality test 
+        // Simple probabilistic primality test
         if fermat_prime(&candidate) {
             return candidate;
         }
@@ -98,9 +101,9 @@ fn run_rsa() -> (BigUint, BigUint, BigUint) {
     loop {
         let p = generate_prime();
         let q = generate_prime();
-        if p == q { 
+        if p == q {
             eprintln!("Same p and q was chosen, picking again.");
-            continue; 
+            continue;
         }
         let n = &p * &q;
         let p_minus_1 = &p - BigUint::one();
@@ -136,6 +139,7 @@ fn main() {
     println!();
 
     let message = "43110";
+    println!("Message:\n{}", &message);
     let m = BigUint::parse_bytes(message.as_bytes(), 10).unwrap();
 
     let c = encrypt_rsa(&m, &n, &e);
@@ -144,4 +148,3 @@ fn main() {
     let m_new = decrypt_rsa(&c, &n, &d);
     println!("Decrypted message:\n{}", &m_new);
 }
-
