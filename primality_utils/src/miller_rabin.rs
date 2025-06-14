@@ -15,8 +15,6 @@ lazy_static! {
 }
 
 fn miller_rabin_helper(n: &BigUint, k: u32) -> bool {
-    let mut rng = thread_rng();
-
     let zero = BigUint::zero();
     let one = BigUint::one();
     let two = &one + &one;
@@ -24,12 +22,8 @@ fn miller_rabin_helper(n: &BigUint, k: u32) -> bool {
     if n < &two {
         return false;
     }
-    if n == &two || n == &BigUint::from(3u8) {
-        return true;
-    }
-    if n % &two == zero {
-        return false;
-    }
+
+    let mut rng = thread_rng();
 
     let mut d = n - &one;
     let mut s = 0;

@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+primality_utils = { path = "../../primality_utils" }
 num-bigint = { version = "0.4.6", features = ["rand"] }
 num-integer = "0.1.46"
 num-traits = "0.2"

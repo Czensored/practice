@@ -13,6 +13,6 @@ pub fn fermat_primality_test(n: &BigUint) -> bool {
         }
     };
 
-    let n_minus_1 = n - BigUint::one();
-    a.modpow(&n_minus_1, n) == BigUint::one()
+
+    a.modpow(&(n - BigUint::one()), n) == BigUint::one()
 }

@@ -6,20 +6,7 @@ use num_integer::Integer;
 use num_traits::{One, Zero};
 use rand::thread_rng;
 use std::mem;
-
-fn fermat_prime(n: &BigUint) -> bool {
-    let mut rng = thread_rng();
-
-    let a = loop {
-        let candidate = rng.gen_biguint_range(&BigUint::from(2u32), &(n - 2u32));
-        if candidate.gcd(n) == BigUint::one() {
-            break candidate;
-        }
-    };
-
-    let n_minus_1 = n - BigUint::one();
-    a.modpow(&n_minus_1, n) == BigUint::one()
-}
+use primality_utils::fermat_primality_test;
 
 fn generate_prime() -> BigUint {
     let mut rng = thread_rng();
@@ -44,7 +31,7 @@ fn generate_prime() -> BigUint {
         }
 
         // Simple probabilistic primality test
-        if fermat_prime(&candidate) {
+        if fermat_primality_test(&candidate) {
             return candidate;
         }
     }
