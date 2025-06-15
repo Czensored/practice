@@ -5,8 +5,8 @@ use primality_utils::miller_rabin;
 use num_bigint::BigUint;
 use num_traits::One;
 
-fn check_numbers(nums: Vec<u128>) {
-    for &n in &nums {
+fn check_numbers(nums: &Vec<u128>) {
+    for &n in nums {
         let n_big = BigUint::from(n);
 
         if miller_rabin(&n_big, 10) {
@@ -39,5 +39,5 @@ fn find_nearest_prime(n: &BigUint, is_above: bool) -> BigUint {
 
 fn main() {
     let nums = vec![270u128, 541, 993, 649, 2, 3, 42010741, 1425172824437700148];
-    check_numbers(nums);
+    check_numbers(&nums);
 }

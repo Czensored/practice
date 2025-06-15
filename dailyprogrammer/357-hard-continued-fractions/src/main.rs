@@ -15,24 +15,27 @@ fn frac_to_gauss(mut n: u64, mut d: u64) -> Vec<u64> {
     ret_vec
 }
 
-fn gauss_to_frac(mut v: Vec<u64>) -> (u64, u64) {
+fn gauss_to_frac(v: &Vec<u64>) -> (u64, u64) {
     assert!(!v.is_empty(), "Input vector must not be empty.");
-    let mut d = v.pop().unwrap();
+
+    let mut iter = v.iter().rev();
+    let mut d = *iter.next().unwrap();
     let mut n = 1;
-    while !v.is_empty() {
-        let mult = v.pop().unwrap();
-        n = n + mult * d;
+
+    for &mult in iter {
+        n += mult * d;
         std::mem::swap(&mut n, &mut d);
     }
-    std::mem::swap(&mut n, &mut d);
-    (n, d)
+
+    // One more swap at the end
+    (d, n)
 }
 
 fn main() {
     println!("{:?}", frac_to_gauss(16, 45));
     println!("{:?}", frac_to_gauss(45, 16));
     println!("{:?}", frac_to_gauss(7, 3));
-    println!("{:?}", gauss_to_frac(frac_to_gauss(30, 7)));
-    println!("{:?}", gauss_to_frac(frac_to_gauss(22, 7)));
-    println!("{:?}", gauss_to_frac(vec![0, 2, 1, 4, 3]));
+    println!("{:?}", gauss_to_frac(&frac_to_gauss(30, 7)));
+    println!("{:?}", gauss_to_frac(&frac_to_gauss(22, 7)));
+    println!("{:?}", gauss_to_frac(&vec![0, 2, 1, 4, 3]));
 }
