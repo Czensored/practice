@@ -6,7 +6,7 @@ use num_integer::Integer;
 use num_traits::{One, Zero};
 use rand::thread_rng;
 use std::mem;
-use primality_utils::fermat_primality_test;
+use primality_utils::FermatPrimalityTest;
 
 fn generate_prime() -> BigUint {
     let mut rng = thread_rng();
@@ -31,7 +31,7 @@ fn generate_prime() -> BigUint {
         }
 
         // Simple probabilistic primality test
-        if fermat_primality_test(&candidate) {
+        if candidate.fermat_primality_test() {
             return candidate;
         }
     }

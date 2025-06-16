@@ -1,6 +1,5 @@
 mod miller_rabin;
 mod fermat;
 
-pub use miller_rabin::miller_rabin;
-pub use fermat::fermat_primality_test;
-
+pub use miller_rabin::MillerRabin;
+pub use fermat::FermatPrimalityTest;

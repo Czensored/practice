@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 use num_bigint::{BigUint, RandBigInt};
-use num_traits::{One, Zero};
+use num_traits::{FromPrimitive, One, Zero};
 use rand::thread_rng;
 
 lazy_static! {
@@ -53,42 +53,7 @@ fn miller_rabin_helper(n: &BigUint, k: u32) -> bool {
     true
 }
 
-/// Determines if a given `BigUint` is probably prime using the Miller-Rabin test.
-///
-/// This implementation includes a fast check for small known primes and performs
-/// `k` rounds of the Miller-Rabin primality test on larger inputs.
-///
-/// # Arguments
-///
-/// * `n` - A reference to a `BigUint` number to be tested for primality.
-/// * `k` - The number of witness rounds to run in the Miller-Rabin test. More rounds
-///         increase the accuracy of the test.
-///
-/// # Returns
-///
-/// * `true` if the number is probably prime (with a high probability depending on `k`)
-/// * `false` if the number is definitely composite
-///
-/// # Notes
-///
-/// - For very large `n`, increase `k` (e.g., 20–40) for stronger confidence.
-/// - This function is probabilistic and may yield false positives for pseudoprimes,
-///   but is very reliable in practice.
-///
-/// # Examples
-///
-/// ```
-/// use num_bigint::BigUint;
-/// use my_primes::miller_rabin;
-///
-/// let prime = BigUint::parse_bytes(b"104729", 10).unwrap(); // 10000th prime
-/// assert!(miller_rabin(&prime, 10));
-///
-/// let composite = BigUint::from(10000u32);
-/// assert!(!miller_rabin(&composite, 10));
-/// ```
-pub fn miller_rabin(n: &BigUint, k: u32) -> bool {
-    // Catch easy primes
+fn miller_rabin_big(n: &BigUint, k: u32) -> bool {
     for p in SMALL_PRIMES.iter() {
         if n == p {
             return true;
@@ -98,4 +63,56 @@ pub fn miller_rabin(n: &BigUint, k: u32) -> bool {
         }
     }
     miller_rabin_helper(n, k)
+}
+
+pub trait MillerRabin {
+    /// Trait for testing probable primality using the Miller-Rabin test.
+    ///
+    /// This provides a unified `.miller_rabin(k)` method for both `BigUint` and `usize`
+    /// values, internally delegating to a fast-checked probabilistic primality test.
+    ///
+    /// # Arguments
+    ///
+    /// * `k` - The number of witness rounds to run in the Miller-Rabin test. More rounds
+    ///         increase the accuracy of the test.
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the number is probably prime (with high confidence)
+    /// * `false` if the number is definitely composite
+    ///
+    /// # Notes
+    ///
+    /// - For large numbers, use a higher `k` (e.g., 20–40) for strong confidence.
+    /// - The test is probabilistic and may yield false positives for pseudoprimes,
+    ///   though it is highly reliable in practice.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use num_bigint::BigUint;
+    /// use my_primes::MillerRabin;
+    ///
+    /// let prime = BigUint::parse_bytes(b"104729", 10).unwrap(); // 10000th prime
+    /// assert!(prime.miller_rabin(10));
+    ///
+    /// let composite = BigUint::from(10000u32);
+    /// assert!(!composite.miller_rabin(10));
+    ///
+    /// assert!(997usize.miller_rabin(10)); // Works for usize too
+    /// ```
+    fn miller_rabin(&self, k: u32) -> bool;
+}
+
+impl MillerRabin for BigUint {
+    fn miller_rabin(&self, k: u32) -> bool {
+        miller_rabin_big(self, k)
+    }
+}
+
+impl MillerRabin for usize {
+    fn miller_rabin(&self, k: u32) -> bool {
+        let n = BigUint::from_usize(*self).expect("Failed to convert usize to BigUint");
+        miller_rabin_big(&n, k)
+    }
 }

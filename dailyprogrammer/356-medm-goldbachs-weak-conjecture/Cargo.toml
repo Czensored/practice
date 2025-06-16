@@ -1,0 +1,7 @@
+[package]
+name = "goldbachs-weak-conjecture"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+primality_utils = { path = "../../primality_utils" }

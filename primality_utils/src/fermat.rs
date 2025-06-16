@@ -3,7 +3,7 @@ use num_traits::One;
 use num_integer::Integer;
 use rand::thread_rng;
 
-pub fn fermat_primality_test(n: &BigUint) -> bool {
+fn fermat_test(n: &BigUint) -> bool {
     let mut rng = thread_rng();
 
     let a = loop {
@@ -15,4 +15,14 @@ pub fn fermat_primality_test(n: &BigUint) -> bool {
 
 
     a.modpow(&(n - BigUint::one()), n) == BigUint::one()
+}
+
+pub trait FermatPrimalityTest {
+    fn fermat_primality_test(&self) -> bool;
+}
+
+impl FermatPrimalityTest for BigUint {
+    fn fermat_primality_test(&self) -> bool {
+        fermat_test(&self)
+    }
 }

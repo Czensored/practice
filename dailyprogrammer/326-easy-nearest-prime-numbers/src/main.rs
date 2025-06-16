@@ -1,7 +1,7 @@
 // Ref: https://www.reddit.com/r/dailyprogrammer/comments/6s70oh/2017087_challenge_326_easy_nearest_prime_numbers/
 // Ref: https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
 
-use primality_utils::miller_rabin;
+use primality_utils::MillerRabin;
 use num_bigint::BigUint;
 use num_traits::One;
 
@@ -9,7 +9,8 @@ fn check_numbers(nums: &Vec<u128>) {
     for &n in nums {
         let n_big = BigUint::from(n);
 
-        if miller_rabin(&n_big, 10) {
+        // if miller_rabin(&n_big, 10) {
+        if n_big.miller_rabin(10) {
             println!("{} is prime.", n);
         } else if n == 1 {
             println!("1 < 2");
@@ -26,7 +27,7 @@ fn find_nearest_prime(n: &BigUint, is_above: bool) -> BigUint {
     let mut candidate = if is_above { n + &one }  else { n - &one };
 
     loop {
-        if miller_rabin(&candidate, 10) {
+        if candidate.miller_rabin(10) {
             return candidate;
         }
         if is_above {

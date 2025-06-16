@@ -1,7 +1,7 @@
 // Ref: https://www.reddit.com/r/dailyprogrammer/comments/8gzaz5/20180504_challenge_359_hard_primes_in_grids/
 // Ref: https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
 
-use primality_utils::miller_rabin;
+use primality_utils::MillerRabin;
 use num_bigint::BigUint;
 use std::collections::HashSet;
 use std::fs::File;
@@ -37,7 +37,7 @@ fn collect_primes_from_grid(grid: &[Vec<char>]) -> HashSet<BigUint> {
                 while r >= 0 && r < n as isize && c >= 0 && c < n as isize {
                     digits.push(grid[r as usize][c as usize]);
                     let num = BigUint::parse_bytes(digits.as_bytes(), 10).unwrap();
-                    if miller_rabin(&num, 10) {
+                    if num.miller_rabin(10) {
                         primes.insert(num.clone());
                     }
                     r += dr;
