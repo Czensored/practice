@@ -23,6 +23,6 @@ pub trait FermatPrimalityTest {
 
 impl FermatPrimalityTest for BigUint {
     fn fermat_primality_test(&self) -> bool {
-        fermat_test(&self)
+        fermat_test(self)
     }
 }

@@ -91,7 +91,7 @@ pub trait MillerRabin {
     ///
     /// ```
     /// use num_bigint::BigUint;
-    /// use my_primes::MillerRabin;
+    /// use primality_utils::MillerRabin;
     ///
     /// let prime = BigUint::parse_bytes(b"104729", 10).unwrap(); // 10000th prime
     /// assert!(prime.miller_rabin(10));
