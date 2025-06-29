@@ -8,8 +8,6 @@ fn flip_front(v: &mut Vec<isize>, n: usize) {
 }
 
 fn pancake_sort(v: &mut Vec<isize>) {
-    while !v.is_sorted() {
-    }
 }
 
 fn main() {

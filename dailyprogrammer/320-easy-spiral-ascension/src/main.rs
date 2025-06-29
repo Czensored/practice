@@ -51,5 +51,5 @@ fn spiral(n: usize) {
 }
 
 fn main() {
-    spiral(20);
+    spiral(6);
 }
