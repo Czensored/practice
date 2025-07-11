@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Learn to fly!</title>
+</head>
+<style>
+  body {
+    background: #1f2639;
+  }
+</style>
+
+<body>
+  <canvas id="viewport" width="800" height="800"></canvas>
+  <div id="controls" style="
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  width: fit-content;
+">
+    <label for="fastForwardCount">Generations:</label>
+    <input type="number" id="fastForwardCount" value="1" min="1" style="width: 60px;">
+    <button id="train">Train</button>
+  </div>
+  <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+  <script src="./bootstrap.js"></script>
+</body>
+
+</html>

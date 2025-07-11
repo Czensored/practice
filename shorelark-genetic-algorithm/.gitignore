@@ -1,0 +1,38 @@
+# Rust
+target
+shared-target
+*.rs.bk
+
+# WASM
+pkg
+*.wasm
+
+# Build output
+dist
+result
+
+# JS/Node
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.vitepress
+.next
+out
+.env
+.env.*
+
+# OS/system
+.DS_Store
+Thumbs.db
+
+# IDE/editors
+.idea/
+.vscode/
+*.swp
+*~
+
+# By-products of npm init wasm-app
+www/.parcel-cache
+www/.cache
