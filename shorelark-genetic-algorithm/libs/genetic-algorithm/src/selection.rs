@@ -1,6 +1,8 @@
 mod roulette_wheel;
+mod rank_based;
 
 pub use self::roulette_wheel::*;
+pub use self::rank_based::*;
 use crate::*;
 
 pub trait SelectionMethod {
