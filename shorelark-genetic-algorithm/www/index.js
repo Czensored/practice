@@ -1,3 +1,4 @@
+// TODO: Fix printing in normal end of cycle
 import * as sim from "../libs/simulation-wasm/pkg/lib_simulation_wasm.js";
 const SPRITE_SIZE = 0.012;
 
@@ -68,7 +69,10 @@ ctxt.fillStyle = 'rgb(0, 0, 0)';
 function redraw() {
   ctxt.clearRect(0, 0, viewportWidth, viewportHeight);
 
-  simulation.step();
+  const stats = simulation.step();
+  if (stats) {
+    console.log(stats);
+  }
 
   const world = simulation.world();
 

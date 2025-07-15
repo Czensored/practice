@@ -7,7 +7,13 @@ mod statistics;
 mod world;
 
 pub use self::{
-    animal::*, animal_individual::*, brain::*, eye::*, food::*, statistics::*, world::*,
+    animal::*,
+    animal_individual::*,
+    brain::*,
+    eye::*,
+    food::*,
+    statistics::*,
+    world::*,
 };
 
 use lib_genetic_algorithm as ga;

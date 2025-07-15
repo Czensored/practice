@@ -47,17 +47,12 @@ impl Simulation {
         World::from(self.sim.world())
     }
 
-    pub fn step(&mut self) {
-        self.sim.step(&mut self.rng);
+    pub fn step(&mut self) -> Option<String> {
+        self.sim.step(&mut self.rng).map(|stats| stats.to_string())
     }
 
     pub fn fast_forward(&mut self) -> String {
-        let stats = self.sim.fast_forward(&mut self.rng);
-
-        format!(
-            "generation {}, min={:.2}, max={:.2}, avg={:.2}",
-            stats.generation, stats.ga.min_fitness, stats.ga.max_fitness, stats.ga.avg_fitness,
-        )
+        self.sim.fast_forward(&mut self.rng).to_string()
     }
 }
 
