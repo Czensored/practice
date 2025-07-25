@@ -1,0 +1,22 @@
+# Rust & Cargo
+/target/
+debug/
+**/*.rs.bk
+*.pdb
+
+# Cargo creates /target in each crate, and also at workspace level
+**/target/
+
+# Dhat output (heap profiling)
+**/dhat-heap.json
+
+# Benchmarks
+**/data/timings.json
+
+# Advent of Code puzzle & input data
+# This assumes each year crate has its own /data/ folder
+
+**/data/inputs/*
+!**/data/inputs/.keep
+**/data/puzzles/*
+!**/data/puzzles/.keep
