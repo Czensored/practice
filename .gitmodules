@@ -1,0 +1,3 @@
+[submodule "advent-of-code"]
+	path = advent-of-code
+	url = https://github.com/Czensored/advent-of-code.git
