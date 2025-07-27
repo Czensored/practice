@@ -7,7 +7,7 @@ Followed a [guide](https://pwy.io/posts/learning-to-fly-pt1/) for this implement
 ```bash
 # Build Rust code
 cd libs/simulation-wasm
-build --target bundler --release
+wasm-pack build --target bundler --release
 
 # Build TypeScript code
 cd ../../www

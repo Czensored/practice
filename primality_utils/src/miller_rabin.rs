@@ -116,3 +116,48 @@ impl MillerRabin for usize {
         miller_rabin_big(&n, k)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn miller_rabin() {
+        // Known primes (usize)
+        let primes = [104729, 99991, 65537];
+        for &p in &primes {
+            assert!(p.miller_rabin(10), "Failed on known usize prime: {}", p);
+        }
+
+        // Known composites (usize)
+        let composites = [10000, 12345, 65535];
+        for &c in &composites {
+            assert!(
+                !c.miller_rabin(10),
+                "Incorrectly marked usize composite as prime: {}",
+                c
+            );
+        }
+    }
+
+    #[test]
+    fn miller_rabin_big() {
+        // Known primes (BigUint)
+        let primes = [104729u32, 99991u32, 65537u32];
+        for &p in &primes {
+            let n = BigUint::from_u32(p).unwrap();
+            assert!(n.miller_rabin(10), "Failed on known BigUint prime: {}", p);
+        }
+
+        // Known composites (BigUint)
+        let composites = [10000u32, 12345u32, 65535u32];
+        for &c in &composites {
+            let n = BigUint::from_u32(c).unwrap();
+            assert!(
+                !n.miller_rabin(10),
+                "Incorrectly marked BigUint composite as prime: {}",
+                c
+            );
+        }
+    }
+}

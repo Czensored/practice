@@ -3,7 +3,7 @@ use num_traits::One;
 use num_integer::Integer;
 use rand::thread_rng;
 
-fn fermat_test(n: &BigUint) -> bool {
+fn fermat_test_biguint(n: &BigUint) -> bool {
     let mut rng = thread_rng();
 
     let a = loop {
@@ -23,6 +23,30 @@ pub trait FermatPrimalityTest {
 
 impl FermatPrimalityTest for BigUint {
     fn fermat_primality_test(&self) -> bool {
-        fermat_test(self)
+        fermat_test_biguint(self)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn fermat_biguint() {
+        // Known primes (usize)
+        let primes = [104729u32, 99991, 65537];
+        for &p in &primes {
+            assert!(fermat_test_biguint(&BigUint::from(p)), "Failed on known usize prime: {}", p);
+        }
+
+        // Known composites (usize)
+        let composites = [10000u32, 12345, 65535];
+        for &c in &composites {
+            assert!(
+                !fermat_test_biguint(&BigUint::from(c)),
+                "Incorrectly marked usize composite as prime: {}",
+                c
+            );
+        }
     }
 }
