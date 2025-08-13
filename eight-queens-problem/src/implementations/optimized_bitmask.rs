@@ -6,9 +6,11 @@ pub fn num_ways_n_queens(n: usize) -> usize {
         n: usize,
         cols: usize,
         main_diags: usize,
-        anti_diags: usize,
+        anti_diags: usize
     ) -> usize {
-        if row == n { return 1; }
+        if row == n {
+            return 1;
+        }
 
         let mut result = 0;
 
@@ -21,7 +23,9 @@ pub fn num_ways_n_queens(n: usize) -> usize {
             avail ^= col_bit;
 
             result += solve(
-                row + 1, n, cols | col_bit, 
+                row + 1,
+                n,
+                cols | col_bit,
                 (main_diags | col_bit) << 1,
                 (anti_diags | col_bit) >> 1,
             )
@@ -51,11 +55,4 @@ pub fn num_ways_n_queens(n: usize) -> usize {
     }
 
     result
-}
-
-#[allow(dead_code)]
-fn main() {
-    let n = 18;
-    let num_ways = num_ways_n_queens(n);
-    println!("{}", num_ways);
 }

@@ -16,7 +16,7 @@ fn benchmark<F: Fn(usize) -> usize>(name: &str, f: F, n: usize) {
 }
 
 fn main() {
-    let n = 14;
+    let n = 15;
 
     benchmark("List", implementations::list::num_ways_n_queens, n);
     benchmark("Bitmask", implementations::bitmask::num_ways_n_queens, n);

@@ -1,0 +1,6 @@
+[package]
+name = "subfactorials-another-twist-on-factorials"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]

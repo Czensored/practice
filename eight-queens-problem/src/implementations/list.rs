@@ -8,17 +8,21 @@ pub fn num_ways_n_queens(n: usize) -> usize {
         n: usize,
         cols: &mut Vec<bool>,
         main_diag: &mut Vec<bool>,
-        anti_diag: &mut Vec<bool>
+        anti_diag: &mut Vec<bool>,
     ) -> usize {
-        if row == n { return 1; }
+        if row == n {
+            return 1;
+        }
 
         let mut result = 0;
-        
+
         for col in 0..n {
             let md = row + col;
             let ad = row + n - col;
 
-            if cols[col] || main_diag[md] || anti_diag[ad] { continue; }
+            if cols[col] || main_diag[md] || anti_diag[ad] {
+                continue;
+            }
 
             cols[col] = true;
             main_diag[md] = true;
@@ -33,11 +37,4 @@ pub fn num_ways_n_queens(n: usize) -> usize {
     }
 
     solve(0, n, &mut cols, &mut main_diag, &mut anti_diag)
-}
-
-#[allow(dead_code)]
-fn main() {
-    let n = 8;
-    let num_ways = num_ways_n_queens(n);
-    println!("{}", num_ways);
 }

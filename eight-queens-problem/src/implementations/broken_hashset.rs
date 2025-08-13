@@ -1,15 +1,15 @@
 use std::collections::HashSet;
 
-fn apply_choice(board: &HashSet<(usize, usize)>, cell: (usize, usize), n: usize) -> HashSet<(usize, usize)> {
+fn apply_choice(
+    board: &HashSet<(usize, usize)>,
+    cell: (usize, usize),
+    n: usize,
+) -> HashSet<(usize, usize)> {
     let mut new_board = board.clone();
 
     new_board.remove(&cell);
-    
-    let directions = [
-        (0, 1),  (1, 0),
-        (1, 1),  (1, -1),
-        (-1, 1), (-1, -1),
-    ];
+
+    let directions = [(0, 1), (1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)];
 
     for i in 0..n {
         for &(dy, dx) in &directions {
@@ -51,10 +51,4 @@ fn num_ways_n_queens(n: usize) -> usize {
     }
 
     pick_and_step(n, board, 0)
-}
-
-fn main() {
-    let n = 2;
-    let num_ways = num_ways_n_queens(n);
-    println!("The number of ways to place {} Queens on an {} by {} chessboard is {}.", n, n, n, num_ways);
 }

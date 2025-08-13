@@ -36,7 +36,7 @@ mod test {
         // Known primes (usize)
         let primes = [104729u32, 99991, 65537];
         for &p in &primes {
-            assert!(fermat_test_biguint(&BigUint::from(p)), "Failed on known usize prime: {}", p);
+            assert!(fermat_test_biguint(&BigUint::from(p)), "Failed on known BigUint prime: {}", p);
         }
 
         // Known composites (usize)
@@ -44,7 +44,7 @@ mod test {
         for &c in &composites {
             assert!(
                 !fermat_test_biguint(&BigUint::from(c)),
-                "Incorrectly marked usize composite as prime: {}",
+                "Incorrectly marked BigUint composite as prime: {}",
                 c
             );
         }
