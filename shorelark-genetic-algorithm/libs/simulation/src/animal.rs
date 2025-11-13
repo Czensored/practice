@@ -8,6 +8,7 @@ pub struct Animal {
     pub(crate) eye: Eye,
     pub(crate) brain: Brain,
     pub(crate) satiation: usize,
+    pub(crate) color: Rgba,
 }
 
 impl Animal {
@@ -27,6 +28,7 @@ impl Animal {
     }
 
     fn new(eye: Eye, brain: Brain, rng: &mut dyn RngCore) -> Self {
+        let color = brain.color();
         Self {
             position: rng.r#gen(),
             rotation: rng.r#gen(),
@@ -34,6 +36,7 @@ impl Animal {
             eye,
             brain,
             satiation: 0,
+            color,
         }
     }
 
@@ -46,5 +49,9 @@ impl Animal {
 
     pub(crate) fn as_chromosome(&self) -> ga::Chromosome {
         self.brain.as_chromosome()
+    }
+
+    pub fn color(&self) -> Rgba {
+        self.color
     }
 }

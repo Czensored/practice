@@ -17,6 +17,14 @@ impl Chromosome {
     pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut f32> {
         self.genes.iter_mut()
     }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut out = Vec::with_capacity(self.genes.len() * 4);
+        for &w in &self.genes {
+            out.extend_from_slice(&w.to_le_bytes());
+        }
+        out
+    }
 }
 
 // ---

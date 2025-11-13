@@ -5,6 +5,7 @@ mod eye;
 mod food;
 mod statistics;
 mod world;
+mod color;
 
 pub use self::{
     animal::*,
@@ -14,6 +15,7 @@ pub use self::{
     food::*,
     statistics::*,
     world::*,
+    color::*,
 };
 
 use lib_genetic_algorithm as ga;

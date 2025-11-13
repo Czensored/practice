@@ -14,7 +14,7 @@ fn ckmin(a: &mut i64, b: i64) -> bool {
     }
 }
 
-fn hungarian(c: &Vec<Vec<i64>>) -> Vec<i64> {
+fn hungarian(c: &[Vec<i64>]) -> Vec<i64> {
     let j = c.len();
     let w = c[0].len();
     assert!(j <= w);
@@ -54,10 +54,10 @@ fn hungarian(c: &Vec<Vec<i64>>) -> Vec<i64> {
 
             for w1 in 0..=w {
                 if in_z[w1] {
-                    ys[job[w1]] = ys[job[w1]] + delta;
-                    yt[w1] = yt[w1] - delta;
+                    ys[job[w1]] += delta;
+                    yt[w1] -= delta;
                 } else {
-                    min_to[w1] = min_to[w1] - delta;
+                    min_to[w1] -= delta;
                 }
             }
 
@@ -87,8 +87,8 @@ fn sanity_check_hungarian() {
     eprintln!("Sanity check passed.");
 }
 
-fn min_cost(costs: &Vec<Vec<i64>>) -> i64 {
-    let potentials = hungarian(&costs);
+fn min_cost(costs: &[Vec<i64>]) -> i64 {
+    let potentials = hungarian(costs);
     *potentials
         .last()
         .expect("Hungarian output should not be empty")

@@ -24,6 +24,7 @@ pub struct Animal {
     pub x: f32,
     pub y: f32,
     pub rotation: f32,
+    pub color: u32,
 }
 
 #[wasm_bindgen]
@@ -67,10 +68,15 @@ impl From<&sim::World> for World {
 
 impl From<&sim::Animal> for Animal {
     fn from(animal: &sim::Animal) -> Self {
+        let c = animal.color();
+
+        let color = u32::from_be_bytes([c.r, c.g, c.b, c.a]);
+
         Self {
             x: animal.position().x,
             y: animal.position().y,
             rotation: animal.rotation().angle(),
+            color,
         }
     }
 }

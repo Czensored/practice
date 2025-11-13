@@ -22,6 +22,11 @@ impl Brain {
         self.nn.weights().collect()
     }
 
+    pub fn color(&self) -> Rgba {
+        let bytes = self.as_chromosome().to_bytes();
+        rgba_from_bytes(&bytes)
+    }
+
     fn topology(eye: &Eye) -> [nn::LayerTopology; 3] {
         [
             nn::LayerTopology {
