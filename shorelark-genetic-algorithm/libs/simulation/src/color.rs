@@ -11,9 +11,9 @@ pub struct Rgba {
 pub fn rgba_from_bytes(bytes: &[u8]) -> Rgba {
     if bytes.is_empty() {
         return Rgba {
-            r: 200,
-            g: 200,
-            b: 200,
+            r: 255,
+            g: 255,
+            b: 255,
             a: 255,
         };
     }
