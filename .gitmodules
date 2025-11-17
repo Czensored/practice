@@ -1,3 +1,6 @@
 [submodule "advent-of-code"]
 	path = advent-of-code
 	url = https://github.com/Czensored/advent-of-code.git
+[submodule "shorelark-expanded"]
+	path = shorelark-expanded
+	url = git@github.com:Czensored/shorelark-expanded.git
