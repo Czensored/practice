@@ -11,7 +11,7 @@ fn read_two_usize() -> Option<(usize, usize)> {
 
     let trimmed = input.trim();
 
-    if trimmed.len() != 2 || !trimmed.chars().all(|c| c.is_digit(10)) {
+    if trimmed.len() != 2 || !trimmed.chars().all(|c| c.is_ascii_digit()) {
         println!("Please enter exactly two digits (e.g. 01, 12, 20).");
         return None;
     }
@@ -29,19 +29,14 @@ fn read_two_usize() -> Option<(usize, usize)> {
     Some((x, y))
 }
 
-fn print_board(v: &Vec<Vec<usize>>) {
+fn print_board(v: &[Vec<usize>]) {
     for (i, tower) in v.iter().enumerate() {
         println!("Pole {}: {:?}", i, tower);
     }
     println!();
 }
 
-fn move_disk(
-    v: &mut Vec<Vec<usize>>,
-    from: usize,
-    to: usize,
-    moves: &mut usize
-) -> bool {
+fn move_disk(v: &mut [Vec<usize>], from: usize, to: usize, moves: &mut usize) -> bool {
     if v[from].is_empty() {
         println!("Pole {} is empty.", from);
         return false;
@@ -49,11 +44,11 @@ fn move_disk(
 
     let from_top = *v[from].last().unwrap();
 
-    if let Some(&to_top) = v[to].last() {
-        if from_top > to_top {
-            println!("Cannot move larger disk onto smaller one.");
-            return false;
-        }
+    if let Some(&to_top) = v[to].last()
+        && from_top > to_top
+    {
+        println!("Cannot move larger disk onto smaller one.");
+        return false;
     }
 
     let disk = v[from].pop().unwrap();
@@ -61,11 +56,11 @@ fn move_disk(
     *moves += 1;
 
     println!("Moved disk {} from {} to {}", disk, from, to);
-    print_board(&v);
+    print_board(v);
     true
 }
 
-fn play_manual(v: &mut Vec<Vec<usize>>, n: usize, moves: &mut usize) {
+fn play_manual(v: &mut [Vec<usize>], n: usize, moves: &mut usize) {
     println!("Manual mode. To input a move, input from and to (e.g. 12 for from=1 to=2)");
     println!("Starting Board");
     print_board(v);
@@ -81,7 +76,7 @@ fn play_manual(v: &mut Vec<Vec<usize>>, n: usize, moves: &mut usize) {
     }
 
     println!("Congratulations! Final state:");
-    print_board(&v);
+    print_board(v);
     println!("Total moves: {}", moves);
 }
 
@@ -90,7 +85,7 @@ fn solve_hanoi(
     from: usize,
     to: usize,
     aux: usize,
-    v: &mut Vec<Vec<usize>>,
+    v: &mut [Vec<usize>],
     moves: &mut usize,
 ) {
     if n == 0 {
@@ -102,16 +97,22 @@ fn solve_hanoi(
     solve_hanoi(n - 1, aux, to, from, v, moves);
 }
 
-fn play_auto(v: &mut Vec<Vec<usize>>, n: usize, moves: &mut usize) {
+fn play_auto(v: &mut [Vec<usize>], n: usize, moves: &mut usize) {
     println!("Auto-solving...\n");
     println!("Starting Board");
-    print_board(&v);
+    print_board(v);
     solve_hanoi(n, 0, 2, 1, v, moves);
     println!("\nDone! Final state: {:?}", v);
     println!("Total moves: {}", moves);
 }
 
-fn tower_of_hanoi(n: usize, mode: &str) {
+#[allow(dead_code)]
+enum Mode {
+    Manual,
+    Auto,
+}
+
+fn tower_of_hanoi(n: usize, mode: Mode) {
     let mut v = vec![vec![], vec![], vec![]];
     for i in (0..n).rev() {
         v[0].push(i);
@@ -120,15 +121,12 @@ fn tower_of_hanoi(n: usize, mode: &str) {
     let mut moves = 0;
 
     match mode {
-        "manual" => play_manual(&mut v, n, &mut moves),
-        "auto" => play_auto(&mut v, n, &mut moves),
-        _ => println!("Unknown mode: choose 'manual' or 'auto'"),
+        Mode::Manual => play_manual(&mut v, n, &mut moves),
+        Mode::Auto => play_auto(&mut v, n, &mut moves),
     }
 }
 
 fn main() {
-    // Change to "manual" or "auto"
-    // tower_of_hanoi(3, "manual");
-    tower_of_hanoi(6, "auto");
+    // tower_of_hanoi(3, Mode::Manual);
+    tower_of_hanoi(6, Mode::Auto);
 }
-

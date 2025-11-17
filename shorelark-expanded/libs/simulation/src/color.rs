@@ -6,7 +6,6 @@ pub struct Rgba {
     pub a: u8,
 }
 
-// Similarity-preserving, colorful: close bytes -> close hue.
 #[inline]
 pub fn rgba_from_bytes(bytes: &[u8]) -> Rgba {
     if bytes.is_empty() {

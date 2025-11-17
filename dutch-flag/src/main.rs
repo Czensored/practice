@@ -176,7 +176,7 @@ fn insertion_sort(a: &mut [i32], size: usize) {
 /// The function sorts the elements of the slice `a` in non-decreasing order using a hybrid of Insertion Sort and Improved QuickSort algorithms.
 /// - For arrays with size less than or equal to `max_arr_size`, it uses Insertion Sort for sorting.
 /// - For arrays larger than `max_arr_size`, it partitions the array using the `impr_partition` function and then sorts the subarrays using Improved QuickSort.
-/// The function modifies the slice `a` in place.
+/// - The function modifies the slice `a` in place.
 ///
 /// # See Also
 ///

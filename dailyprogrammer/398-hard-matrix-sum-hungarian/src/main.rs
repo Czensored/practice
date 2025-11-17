@@ -108,7 +108,7 @@ fn test1() {
     println!("{}", result);
 }
 
-fn test_from_url(url: &str) -> Result<(), Box<dyn Error>> {
+fn test_from_url(url: &str) -> Result<i64, Box<dyn Error>> {
     let response = blocking::get(url)?.text()?;
 
     let costs: Vec<Vec<i64>> = response
@@ -122,7 +122,7 @@ fn test_from_url(url: &str) -> Result<(), Box<dyn Error>> {
 
     let result = min_cost(&costs);
     println!("{}", result);
-    Ok(())
+    Ok(result)
 }
 
 fn main() {

@@ -1,3 +1,5 @@
+use std::fmt::Write;
+
 pub struct SudokuBoard {
     board: [[usize; 9]; 9],
     past_boards: Vec<[[usize; 9]; 9]>
@@ -20,23 +22,47 @@ impl SudokuBoard {
         }
     }
 
+    // pub fn print(&self) {
+    //     for (i, arr) in self.board.iter().enumerate() {
+    //         if i != 0 && i % 3 == 0 {
+    //             println!("------+-------+------");
+    //         }
+    //         for (j, val) in arr.iter().enumerate() {
+    //             if j != 0 && j % 3 == 0 {
+    //                 print!("| ");
+    //             }
+    //             if *val != 0 {
+    //                 print!("{val} ");
+    //             } else {
+    //                 print!(". ");
+    //             }
+    //         }
+    //         println!();
+    //     }
+    // }
+
     pub fn print(&self) {
+        let mut out = String::new();
+
         for (i, arr) in self.board.iter().enumerate() {
             if i != 0 && i % 3 == 0 {
-                println!("------+-------+------");
+                out.push_str("------+-------+------\n");
             }
             for (j, val) in arr.iter().enumerate() {
                 if j != 0 && j % 3 == 0 {
-                    print!("| ");
+                    out.push_str("| ");
                 }
                 if *val != 0 {
-                    print!("{val} ");
+                    let _ = write!(out, "{} ", val);
                 } else {
-                    print!(". ");
+                    out.push_str(". ");
                 }
             }
-            println!();
+
+            out.push('\n');
         }
+
+        print!("{}", out);
     }
 
     pub fn go(&mut self, row: usize, col: usize, num: usize) -> bool {
