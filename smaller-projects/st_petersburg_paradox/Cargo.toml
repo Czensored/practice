@@ -1,0 +1,17 @@
+[package]
+name = "st_petersburg_paradox"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+num-bigint = "0.4.6"
+rand = "0.9"
+num-traits = "0.2.19"
+rayon = "1.11.0"
+
+[dev-dependencies]
+criterion = { version = "0.7", features = ["html_reports"] }
+
+[[bench]]
+name = "rolling_avg_bench"
+harness = false
