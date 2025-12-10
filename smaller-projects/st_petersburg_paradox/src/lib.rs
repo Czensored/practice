@@ -1,5 +1,3 @@
-use core::time;
-
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use rand::rngs::SmallRng;
@@ -51,19 +49,21 @@ pub fn rolling_avg_old(num_trials: u64) -> BigUint {
     sum / num_trials
 }
 
-pub fn rolling_avg_paralell(num_trials: u64) -> BigUint {
-    // ! TODO spawn fewer threads but still use multithreading
-    // Have each thread handle more trials each
-    let counts: [u64; 66] = (0..num_trials)
+pub fn rolling_avg_parallel(num_trials: u64) -> BigUint {
+    let counts: [u64; 66] = (0..num_trials as usize)
         .into_par_iter()
-        .map_init(SmallRng::from_os_rng, |rng, _| trial_exponent(rng) as usize)
-        .fold(
-            || [0u64; 66],
-            |mut local_counts, e| {
-                local_counts[e] += 1;
-                local_counts
-            },
-        )
+        .chunks(5000)
+        .map_init(SmallRng::from_os_rng, |rng, chunk| {
+            let mut local = [0u64; 66];
+
+            // discarded value below is the trial index
+            for _ in chunk {
+                let e = trial_exponent(rng) as usize;
+                local[e] += 1;
+            }
+
+            local
+        })
         .reduce(
             || [0u64; 66],
             |mut a, b| {
