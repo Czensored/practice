@@ -1,7 +1,3 @@
----
-author: Isaac Salzman
----
-
 # Coding Practice & Projects Repo
 
 This repo is a collection of personal projects, practice exercises, and coding challenges.  
