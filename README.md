@@ -18,11 +18,11 @@ My solutions to the annual [Advent of Code](https://adventofcode.com/) programmi
 - **[Daily Programmer](./dailyprogrammer/)**  
 A collection of problems and solutions from the [r/DailyProgrammer](https://www.reddit.com/r/dailyprogrammer/) subreddit.
 
+- **[DFA Playground](./dfa-playground/)**  
+Table-driven DFA scanners and tokenizers for text parsing.
+
 - **[Dutch Flag](./dutch-flag/)**  
 Performance comparisons of different implementations of the [Dutch National Flag algorithm](https://en.wikipedia.org/wiki/Dutch_national_flag_problem).
-
-- **[Sudoku Solver](./smaller-projects/sudoku-solver/)**  
-An depth-first search algorithm to solve 9x9 sudoku puzzles.
 
 Several other small exercises and projects are included in this repository.
 
