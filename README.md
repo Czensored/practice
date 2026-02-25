@@ -1,13 +1,13 @@
 # Coding Practice & Projects Repo
 
-This repo is a collection of personal projects, practice exercises, and coding challenges.  
+This repo is a collection of personal projects, practice exercises, and coding challenges.
 
 ## Highlighted Projects
 
 - **[Shorelark Expanded](https://github.com/Czensored/shorelark-expanded)**  
 An expanded version of the original [Shorelark](https://shorelark.pwy.io/) project by Patryk Wychowaniec.
 
-- **[Othello AI](https://github.com/Czensored/othello-hybrid)**  
+- **[Othello AI](https://github.com/Czensored/othello-ai-demo)**  
 A program that uses the minimax algorithm with alpha beta pruning to play Othello/Reversi.
 
 - **[Advent of Code](https://github.com/Czensored/advent-of-code)**  
