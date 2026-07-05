@@ -16,18 +16,14 @@ fn spiral(n: usize) {
             matrix[row][right] = num;
             num += 1;
         }
-        if right > 0 {
-            right -= 1;
-        }
+        right -= 1;
 
         if top <= bottom {
             for col in (left..=right).rev() {
                 matrix[bottom][col] = num;
                 num += 1;
             }
-            if bottom > 0 {
-                bottom -= 1;
-            }
+            bottom -= 1;
         }
 
         if left <= right {

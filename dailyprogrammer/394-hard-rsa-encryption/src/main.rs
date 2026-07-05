@@ -1,137 +1,130 @@
 // Ref: https://www.reddit.com/r/dailyprogrammer/comments/nzmvsj/20210614_challenge_394_difficult_rsa_encryption/
 // This algorithm is not actually cryptographically secure, I did not use secure rng
 
-use num_bigint::{BigInt, BigUint, RandBigInt, ToBigInt};
-use num_integer::Integer;
-use num_traits::{One, Zero};
-use rand::thread_rng;
-use std::mem;
-use primality_utils::FermatPrimalityTest;
+use rsa_encryption::generate_keypair;
+use std::env;
+use std::error::Error;
+use std::fs;
+use std::io::{self, Write};
+use std::path::{Path, PathBuf};
+use std::process;
 
-fn generate_prime() -> BigUint {
-    let mut rng = thread_rng();
+const DEFAULT_KEY_NAME: &str = "ssh_assignment_rsa";
 
-    let small_primes: Vec<BigUint> = vec![2u32, 3, 5, 7, 11]
-        .into_iter()
-        .map(BigUint::from)
-        .collect();
-
-    let lower = BigUint::one() << 256;
-    let upper = BigUint::one() << 512;
-
-    loop {
-        let candidate = rng.gen_biguint_range(&lower, &upper);
-        // let candidate = rng.gen_biguint(256);
-
-        if small_primes
-            .iter()
-            .any(|p| &candidate % p == BigUint::zero())
-        {
-            continue;
-        }
-
-        // Simple probabilistic primality test
-        if candidate.fermat_primality_test() {
-            return candidate;
-        }
-    }
-}
-
-fn lcm(a: &BigUint, b: &BigUint) -> BigUint {
-    if a.is_zero() || b.is_zero() {
-        return BigUint::zero();
-    }
-    // normally have to take abs(a * b), but they are uints, so no worries
-    (a * b) / a.gcd(b)
-}
-
-fn extended_gcd(a: &BigUint, b: &BigUint) -> (BigUint, BigInt, BigInt) {
-    let mut r0 = a.to_bigint().unwrap();
-    let mut r1 = b.to_bigint().unwrap();
-    let mut s0 = BigInt::one();
-    let mut s1 = BigInt::zero();
-    let mut t0 = BigInt::zero();
-    let mut t1 = BigInt::one();
-
-    while !r1.is_zero() {
-        let q = &r0 / &r1;
-
-        let r_temp = &r0 - &q * &r1;
-        r0 = mem::replace(&mut r1, r_temp);
-
-        let s_temp = &s0 - &q * &s1;
-        s0 = mem::replace(&mut s1, s_temp);
-
-        let t_temp = &t0 - &q * &t1;
-        t0 = mem::replace(&mut t1, t_temp);
-    }
-
-    let gcd = r0.to_biguint().unwrap();
-
-    (gcd, s0, t0)
-}
-
-fn modular_inverse(a: &BigUint, b: &BigUint) -> Option<BigUint> {
-    let (gcd, inv, _) = extended_gcd(a, b);
-
-    if gcd != BigUint::one() {
-        return None;
-    }
-
-    let b_bigint = b.to_bigint().unwrap();
-    let pos_inv = ((inv % &b_bigint) + &b_bigint) % &b_bigint;
-
-    pos_inv.to_biguint()
-}
-
-fn run_rsa() -> (BigUint, BigUint, BigUint) {
-    loop {
-        let p = generate_prime();
-        let q = generate_prime();
-        if p == q {
-            eprintln!("Same p and q was chosen, picking again.");
-            continue;
-        }
-        let n = &p * &q;
-        let p_minus_1 = &p - BigUint::one();
-        let q_minus_1 = &q - BigUint::one();
-        let c_tot = lcm(&p_minus_1, &q_minus_1);
-        let e = BigUint::from(65537u32);
-
-        if let Some(d) = modular_inverse(&e, &c_tot) {
-            println!("Public key n:\n{}", n);
-            println!("Public key e:\n{}", e);
-            println!("Private key d:\n{}", d);
-            return (n, e, d);
-        } else {
-            // I've never seen this trigger, exists just in case fermat's fails
-            eprintln!("Modular inverse failed; retrying with new primes.");
-        }
-    }
-}
-
-fn encrypt_rsa(m: &BigUint, n: &BigUint, e: &BigUint) -> BigUint {
-    if m >= n {
-        panic!("Message too large for encryption");
-    }
-    m.modpow(e, n)
-}
-
-fn decrypt_rsa(c: &BigUint, n: &BigUint, d: &BigUint) -> BigUint {
-    c.modpow(d, n)
+struct Cli {
+    out_dir: PathBuf,
+    name: String,
+    comment: String,
 }
 
 fn main() {
-    let (n, e, d) = run_rsa();
-    println!();
+    let cli = match parse_args() {
+        Ok(cli) => cli,
+        Err(message) => {
+            eprintln!("{message}");
+            process::exit(2);
+        }
+    };
 
-    let message = "43110";
-    println!("Message:\n{}", &message);
-    let m = BigUint::parse_bytes(message.as_bytes(), 10).unwrap();
+    let keypair = generate_keypair();
 
-    let c = encrypt_rsa(&m, &n, &e);
-    println!("Encrypted ciphertext:\n{}", &c);
+    if let Err(err) = write_ssh_keypair(&keypair, &cli.out_dir, &cli.name, &cli.comment) {
+        eprintln!("error: {err}");
+        process::exit(1);
+    }
+}
 
-    let m_new = decrypt_rsa(&c, &n, &d);
-    println!("Decrypted message:\n{}", &m_new);
+fn parse_args() -> Result<Cli, String> {
+    let mut out_dir = PathBuf::from(".");
+    let mut name = DEFAULT_KEY_NAME.to_string();
+    let mut comment = String::new();
+    let mut args = env::args().skip(1);
+
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--out-dir" => {
+                let value = args
+                    .next()
+                    .ok_or_else(|| "--out-dir requires a directory".to_string())?;
+                out_dir = PathBuf::from(value);
+            }
+            "--name" => {
+                name = args
+                    .next()
+                    .ok_or_else(|| "--name requires a filename".to_string())?;
+            }
+            "--comment" => {
+                comment = args
+                    .next()
+                    .ok_or_else(|| "--comment requires a value".to_string())?;
+            }
+            "--help" | "-h" => {
+                println!(
+                    "Usage: cargo run --release -- [--out-dir DIR] [--name FILE] [--comment TEXT]\n\
+                     \n\
+                     Writes FILE and FILE.pub as an OpenSSH RSA keypair.\n\
+                     By default, DIR is the current directory and FILE is ssh_assignment_rsa."
+                );
+                process::exit(0);
+            }
+            unknown => return Err(format!("unknown argument: {unknown}")),
+        }
+    }
+
+    Ok(Cli {
+        out_dir,
+        name,
+        comment,
+    })
+}
+
+fn write_ssh_keypair(
+    keypair: &rsa_encryption::RsaKeyPair,
+    out_dir: &Path,
+    name: &str,
+    comment: &str,
+) -> Result<(), Box<dyn Error>> {
+    if name.is_empty() || name.contains('/') {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "key name must be a filename, not a path",
+        )
+        .into());
+    }
+
+    fs::create_dir_all(out_dir)?;
+
+    let private_path = out_dir.join(name);
+    let public_path = out_dir.join(format!("{name}.pub"));
+    let private_key = keypair.to_openssh_private_key(comment)?;
+    let public_key = keypair.to_openssh_public_key(comment);
+
+    write_file_with_mode(&private_path, &private_key, 0o600)?;
+    write_file_with_mode(&public_path, &public_key, 0o644)?;
+
+    println!("Wrote private key: {}", private_path.display());
+    println!("Wrote public key:  {}", public_path.display());
+    println!("Install the .pub line on the server, then connect with:");
+    println!("ssh -i {} user@host", private_path.display());
+
+    Ok(())
+}
+
+#[cfg(unix)]
+fn write_file_with_mode(path: &Path, contents: &str, mode: u32) -> io::Result<()> {
+    use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
+
+    let mut file = fs::OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .mode(mode)
+        .open(path)?;
+    file.write_all(contents.as_bytes())?;
+    fs::set_permissions(path, fs::Permissions::from_mode(mode))
+}
+
+#[cfg(not(unix))]
+fn write_file_with_mode(path: &Path, contents: &str, _mode: u32) -> io::Result<()> {
+    fs::write(path, contents)
 }

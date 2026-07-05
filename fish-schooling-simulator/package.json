@@ -1,0 +1,15 @@
+{
+  "name": "fish-schooling-simulator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:wasm": "CARGO_TARGET_DIR=target wasm-pack build --target web --out-dir pkg",
+    "dev": "npm run build:wasm && vite --host 127.0.0.1",
+    "build": "npm run build:wasm && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
+}
