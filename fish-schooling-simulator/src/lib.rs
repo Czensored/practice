@@ -151,6 +151,7 @@ pub struct Simulation {
     fish: Vec<Agent>,
     shark: Agent,
     shark_target: Option<SharkTarget>,
+    fish_eaten: usize,
     fish_positions: Vec<f32>,
     elapsed_seconds: f32,
 }
@@ -175,7 +176,7 @@ impl Simulation {
 
         self.elapsed_seconds += dt;
         self.update_fish(dt);
-        self.eat_colliding_fish();
+        self.fish_eaten += self.eat_colliding_fish();
         self.update_shark(dt);
     }
 
@@ -206,6 +207,22 @@ impl Simulation {
 
     pub fn fish_count(&self) -> usize {
         self.fish.len()
+    }
+
+    pub fn fish_eaten(&self) -> usize {
+        self.fish_eaten
+    }
+
+    pub fn fish_eaten_per_minute(&self) -> f32 {
+        if self.elapsed_seconds <= f32::EPSILON {
+            0.0
+        } else {
+            self.fish_eaten as f32 / self.elapsed_seconds * 60.0
+        }
+    }
+
+    pub fn elapsed_seconds(&self) -> f32 {
+        self.elapsed_seconds
     }
 
     pub fn world_width(&self) -> f32 {
@@ -240,6 +257,7 @@ impl Simulation {
                     * config.shark_speed,
             },
             shark_target: None,
+            fish_eaten: 0,
             fish_positions: Vec::new(),
             elapsed_seconds: 0.0,
         }
@@ -285,7 +303,9 @@ impl Simulation {
                 self.config.world_height,
             );
 
-            if self.eat_colliding_fish() > 0 {
+            let eaten = self.eat_colliding_fish();
+            if eaten > 0 {
+                self.fish_eaten += eaten;
                 self.shark_target = None;
             }
         } else {
@@ -522,6 +542,18 @@ mod tests {
         }
     }
 
+    fn test_simulation(config: SimulationConfig) -> Simulation {
+        Simulation {
+            config,
+            fish: Vec::new(),
+            shark: agent(0.0, 0.0),
+            shark_target: None,
+            fish_eaten: 0,
+            fish_positions: Vec::new(),
+            elapsed_seconds: 0.0,
+        }
+    }
+
     #[test]
     fn fish_steers_away_from_nearby_fish() {
         let fish = vec![
@@ -607,6 +639,7 @@ mod tests {
             fish: vec![agent(50.0, 50.0), agent(55.0, 50.0)],
             shark: agent(180.0, 100.0),
             shark_target: None,
+            fish_eaten: 0,
             fish_positions: Vec::new(),
             elapsed_seconds: 0.0,
         };
@@ -625,6 +658,7 @@ mod tests {
             fish: vec![agent(30.0, 10.0), agent(180.0, 100.0)],
             shark: agent(10.0, 10.0),
             shark_target: None,
+            fish_eaten: 0,
             fish_positions: Vec::new(),
             elapsed_seconds: 0.0,
         };
@@ -647,6 +681,7 @@ mod tests {
             fish: vec![agent(0.0, 60.0)],
             shark: agent(10.0, 60.0),
             shark_target: None,
+            fish_eaten: 0,
             fish_positions: Vec::new(),
             elapsed_seconds: 0.0,
         };
@@ -674,6 +709,7 @@ mod tests {
             ],
             shark: agent(180.0, 100.0),
             shark_target: None,
+            fish_eaten: 0,
             fish_positions: Vec::new(),
             elapsed_seconds: 0.0,
         };
@@ -696,6 +732,7 @@ mod tests {
             fish: vec![agent(11.0, 10.0), agent(150.0, 100.0)],
             shark: agent(10.0, 10.0),
             shark_target: None,
+            fish_eaten: 0,
             fish_positions: Vec::new(),
             elapsed_seconds: 0.0,
         };
@@ -703,8 +740,30 @@ mod tests {
         simulation.tick(0.1);
 
         assert_eq!(simulation.fish.len(), 1);
+        assert_eq!(simulation.fish_eaten(), 1);
         assert!(simulation.fish[0].position.x > 100.0);
         assert!(simulation.fish[0].position.y > 80.0);
+    }
+
+    #[test]
+    fn fish_eaten_per_minute_uses_elapsed_simulation_time() {
+        let mut simulation = test_simulation(test_config());
+
+        assert_eq!(simulation.fish_eaten_per_minute(), 0.0);
+
+        simulation.fish_eaten = 3;
+        simulation.elapsed_seconds = 30.0;
+
+        assert_eq!(simulation.fish_eaten_per_minute(), 6.0);
+    }
+
+    #[test]
+    fn elapsed_seconds_reports_simulation_clock() {
+        let mut simulation = test_simulation(test_config());
+
+        simulation.tick(0.25);
+
+        assert_eq!(simulation.elapsed_seconds(), 0.25);
     }
 
     #[test]
@@ -742,6 +801,7 @@ mod tests {
             fish: vec![agent(5.0, 60.0)],
             shark: agent(180.0, 100.0),
             shark_target: None,
+            fish_eaten: 0,
             fish_positions: Vec::new(),
             elapsed_seconds: 0.0,
         };

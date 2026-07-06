@@ -6,7 +6,47 @@
     <title>Fish Schooling Simulator</title>
   </head>
   <body>
-    <canvas id="simulation" aria-label="Fish schooling simulation"></canvas>
+    <div class="app-shell">
+      <aside class="control-panel" aria-label="Simulation controls">
+        <div class="panel-header">
+          <h1>Fish School</h1>
+        </div>
+
+        <div class="control-group">
+          <span class="control-label">Speed</span>
+          <div class="segmented-control" role="group" aria-label="Simulation speed">
+            <button class="speed-button is-active" type="button" data-speed="1" aria-pressed="true">
+              1x
+            </button>
+            <button class="speed-button" type="button" data-speed="2" aria-pressed="false">
+              2x
+            </button>
+            <button class="speed-button" type="button" data-speed="4" aria-pressed="false">
+              4x
+            </button>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-label">Fish eaten</span>
+          <span class="stat-value" id="fish-eaten">0</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-label">Eaten / min</span>
+          <span class="stat-value" id="fish-eaten-rate">0.0</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-label">Sim time</span>
+          <span class="stat-value" id="elapsed-time">0:00</span>
+        </div>
+      </aside>
+
+      <main class="simulation-stage">
+        <canvas id="simulation" aria-label="Fish schooling simulation"></canvas>
+      </main>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

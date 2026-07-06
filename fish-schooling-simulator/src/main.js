@@ -3,30 +3,59 @@ import "./styles.css";
 
 const canvas = document.querySelector("#simulation");
 const context = canvas.getContext("2d");
+const speedButtons = [...document.querySelectorAll(".speed-button")];
+const fishEatenValue = document.querySelector("#fish-eaten");
+const fishEatenRateValue = document.querySelector("#fish-eaten-rate");
+const elapsedTimeValue = document.querySelector("#elapsed-time");
 
 await init();
 
 const simulation = new Simulation();
+let simulationSpeed = 1;
 let previousTime = performance.now();
+
+function setSimulationSpeed(nextSpeed) {
+  simulationSpeed = nextSpeed;
+
+  for (const button of speedButtons) {
+    const isActive = Number(button.dataset.speed) === simulationSpeed;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  }
+}
+
+for (const button of speedButtons) {
+  button.addEventListener("click", () => {
+    setSimulationSpeed(Number(button.dataset.speed));
+  });
+}
+
+function formatElapsedTime(totalSeconds) {
+  const wholeSeconds = Math.floor(totalSeconds);
+  const minutes = Math.floor(wholeSeconds / 60);
+  const seconds = String(wholeSeconds % 60).padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
 
 function resizeCanvas() {
   const pixelRatio = window.devicePixelRatio || 1;
-  canvas.width = Math.floor(window.innerWidth * pixelRatio);
-  canvas.height = Math.floor(window.innerHeight * pixelRatio);
-  canvas.style.width = `${window.innerWidth}px`;
-  canvas.style.height = `${window.innerHeight}px`;
+  const { width, height } = canvas.getBoundingClientRect();
+  canvas.width = Math.floor(width * pixelRatio);
+  canvas.height = Math.floor(height * pixelRatio);
   context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 }
 
 function worldTransform() {
   const worldWidth = simulation.world_width();
   const worldHeight = simulation.world_height();
+  const viewportWidth = canvas.clientWidth;
+  const viewportHeight = canvas.clientHeight;
   const scale = Math.min(
-    window.innerWidth / worldWidth,
-    window.innerHeight / worldHeight,
+    viewportWidth / worldWidth,
+    viewportHeight / worldHeight,
   );
-  const offsetX = (window.innerWidth - worldWidth * scale) * 0.5;
-  const offsetY = (window.innerHeight - worldHeight * scale) * 0.5;
+  const offsetX = (viewportWidth - worldWidth * scale) * 0.5;
+  const offsetY = (viewportHeight - worldHeight * scale) * 0.5;
 
   return { scale, offsetX, offsetY, worldWidth, worldHeight };
 }
@@ -65,10 +94,12 @@ function drawShark(x, y, headingX, headingY, transform) {
 
 function draw() {
   const transform = worldTransform();
+  const viewportWidth = canvas.clientWidth;
+  const viewportHeight = canvas.clientHeight;
 
-  context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  context.clearRect(0, 0, viewportWidth, viewportHeight);
   context.fillStyle = "#071923";
-  context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  context.fillRect(0, 0, viewportWidth, viewportHeight);
 
   context.strokeStyle = "rgba(155, 216, 217, 0.22)";
   context.lineWidth = 1;
@@ -137,7 +168,10 @@ function animate(currentTime) {
   const deltaSeconds = (currentTime - previousTime) / 1000;
   previousTime = currentTime;
 
-  simulation.tick(deltaSeconds);
+  simulation.tick(deltaSeconds * simulationSpeed);
+  fishEatenValue.textContent = String(simulation.fish_eaten());
+  fishEatenRateValue.textContent = simulation.fish_eaten_per_minute().toFixed(1);
+  elapsedTimeValue.textContent = formatElapsedTime(simulation.elapsed_seconds());
   draw();
   requestAnimationFrame(animate);
 }
