@@ -118,11 +118,7 @@ pub(crate) fn best_shark_target_2d(
 }
 
 pub(crate) fn shark_speed_for_target_2d(target: SharkTarget2d, config: SimulationConfig) -> f32 {
-    if target.crowding > 0 {
-        config.shark_speed * config.shark_confused_speed_multiplier
-    } else {
-        config.shark_speed
-    }
+    config.shark_speed * shark_confusion_speed_multiplier(target.crowding, config)
 }
 
 pub(crate) fn shark_search_steering_2d(
@@ -131,11 +127,15 @@ pub(crate) fn shark_search_steering_2d(
     elapsed_seconds: f32,
     config: SimulationConfig,
 ) -> Vec2 {
-    let heading = velocity.normalized_or(Vec2::new(1.0, 0.0));
-    let wander_angle = elapsed_seconds * 0.36 + position.x * 0.003 - position.y * 0.002;
-    let wander = Vec2::new(wander_angle.cos(), wander_angle.sin());
+    let boundary = boundary_steering_2d(position, config);
+    if boundary.length_squared() > f32::EPSILON {
+        return boundary;
+    }
 
-    heading + wander * config.shark_search_wander_strength + boundary_steering_2d(position, config)
+    let heading = velocity.normalized_or(Vec2::new(1.0, 0.0));
+    let random = random_walk_direction_2d(elapsed_seconds, config);
+
+    heading + random * config.shark_search_wander_strength
 }
 
 fn nearby_fish_count_2d(
@@ -321,11 +321,7 @@ pub(crate) fn best_shark_target_3d(
 }
 
 pub(crate) fn shark_speed_for_target_3d(target: SharkTarget3d, config: SimulationConfig) -> f32 {
-    if target.crowding > 0 {
-        config.shark_speed * config.shark_confused_speed_multiplier
-    } else {
-        config.shark_speed
-    }
+    config.shark_speed * shark_confusion_speed_multiplier(target.crowding, config)
 }
 
 pub(crate) fn shark_search_steering_3d(
@@ -334,17 +330,15 @@ pub(crate) fn shark_search_steering_3d(
     elapsed_seconds: f32,
     config: SimulationConfig,
 ) -> Vec3 {
-    let heading = velocity.normalized_or(Vec3::new(1.0, 0.0, 0.0));
-    let wander_angle = elapsed_seconds * 0.36 + position.x * 0.003 - position.y * 0.002;
-    let depth_angle = elapsed_seconds * 0.27 + position.z * 0.004;
-    let wander = Vec3::new(
-        wander_angle.cos(),
-        wander_angle.sin(),
-        depth_angle.sin() * 0.55,
-    )
-    .normalized_or(Vec3::new(1.0, 0.0, 0.0));
+    let boundary = boundary_steering_3d(position, config);
+    if boundary.length_squared() > f32::EPSILON {
+        return boundary;
+    }
 
-    heading + wander * config.shark_search_wander_strength + boundary_steering_3d(position, config)
+    let heading = velocity.normalized_or(Vec3::new(1.0, 0.0, 0.0));
+    let random = random_walk_direction_3d(elapsed_seconds, config);
+
+    heading + random * config.shark_search_wander_strength
 }
 
 fn nearby_fish_count_3d(
@@ -363,11 +357,43 @@ fn nearby_fish_count_3d(
         .count()
 }
 
+fn shark_confusion_speed_multiplier(crowding: usize, config: SimulationConfig) -> f32 {
+    let full_crowding = config.shark_confusion_full_crowding.max(1.0);
+    let confusion = (crowding as f32 / full_crowding).min(1.0);
+    let max_slowdown = config.shark_max_confusion_slowdown.clamp(0.0, 1.0);
+
+    1.0 - confusion * max_slowdown
+}
+
 fn wander_direction_3d(fish_index: usize, elapsed_seconds: f32) -> Vec3 {
     let angle = elapsed_seconds * 0.75 + fish_index as f32 * 0.19;
     let depth_angle = elapsed_seconds * 0.43 + fish_index as f32 * 0.31;
     Vec3::new(angle.cos(), angle.sin(), depth_angle.sin() * 0.6)
         .normalized_or(index_direction_3d(fish_index))
+}
+
+fn random_walk_direction_2d(elapsed_seconds: f32, config: SimulationConfig) -> Vec2 {
+    let step = random_walk_step(elapsed_seconds, config);
+    let angle = search_noise(step * 12.989_8 + 4.137) * std::f32::consts::TAU;
+    Vec2::new(angle.cos(), angle.sin())
+}
+
+fn random_walk_direction_3d(elapsed_seconds: f32, config: SimulationConfig) -> Vec3 {
+    let step = random_walk_step(elapsed_seconds, config);
+    let angle = search_noise(step * 12.989_8 + 4.137) * std::f32::consts::TAU;
+    let vertical = search_noise(step * 78.233 + 9.611) * 1.4 - 0.7;
+    let horizontal = (1.0 - vertical * vertical).sqrt();
+
+    Vec3::new(angle.cos() * horizontal, angle.sin() * horizontal, vertical)
+        .normalized_or(Vec3::new(1.0, 0.0, 0.0))
+}
+
+fn random_walk_step(elapsed_seconds: f32, config: SimulationConfig) -> f32 {
+    (elapsed_seconds / config.shark_search_turn_seconds.max(0.1)).floor()
+}
+
+fn search_noise(seed: f32) -> f32 {
+    ((seed.sin() * 12.989_8 + seed.cos() * 78.233).sin() * 0.5 + 0.5).clamp(0.0, 1.0)
 }
 
 pub(crate) fn move_toward_3d(current: Vec3, target: Vec3, max_delta: f32) -> Vec3 {

@@ -547,9 +547,11 @@ mod tests {
             shark_eat_radius: 5.0,
             shark_confusion_radius: 12.0,
             shark_crowding_penalty: 50.0,
-            shark_confused_speed_multiplier: 0.5,
+            shark_confusion_full_crowding: 4.0,
+            shark_max_confusion_slowdown: 0.4,
             shark_search_speed_multiplier: 0.55,
             shark_search_wander_strength: 0.75,
+            shark_search_turn_seconds: 1.0,
             shark_search_turn_acceleration: 100.0,
             boundary_margin: 20.0,
             boundary_avoidance_strength: 3.0,
@@ -583,6 +585,13 @@ mod tests {
             position: Vec3::new(x, y, z),
             velocity: Vec3::ZERO,
         }
+    }
+
+    fn assert_close(actual: f32, expected: f32) {
+        assert!(
+            (actual - expected).abs() < 0.0001,
+            "expected {actual} to be close to {expected}"
+        );
     }
 
     fn test_simulation(config: SimulationConfig) -> Simulation {
@@ -658,6 +667,71 @@ mod tests {
                 position: Vec2::new(70.0, 10.0),
                 crowding: 0,
             })
+        );
+    }
+
+    #[test]
+    fn shark_uses_full_speed_for_uncrowded_target() {
+        let config = test_config();
+        let target = SharkTarget2d {
+            position: Vec2::new(70.0, 10.0),
+            crowding: 0,
+        };
+
+        assert_close(
+            shark_speed_for_target_2d(target, config),
+            config.shark_speed,
+        );
+    }
+
+    #[test]
+    fn shark_confusion_slowdown_scales_with_crowding() {
+        let config = test_config();
+        let target = SharkTarget2d {
+            position: Vec2::new(70.0, 10.0),
+            crowding: 1,
+        };
+
+        assert_close(shark_speed_for_target_2d(target, config), 10.8);
+    }
+
+    #[test]
+    fn shark_confusion_slowdown_reaches_configured_maximum() {
+        let config = test_config();
+        let target = SharkTarget2d {
+            position: Vec2::new(70.0, 10.0),
+            crowding: 4,
+        };
+
+        assert_close(shark_speed_for_target_2d(target, config), 7.2);
+    }
+
+    #[test]
+    fn shark_confusion_slowdown_clamps_above_full_crowding() {
+        let config = test_config();
+        let target = SharkTarget2d {
+            position: Vec2::new(70.0, 10.0),
+            crowding: 12,
+        };
+
+        assert_close(shark_speed_for_target_2d(target, config), 7.2);
+    }
+
+    #[test]
+    fn shark_confusion_speed_matches_in_2d_and_3d() {
+        let config = test_config();
+        let target_2d = SharkTarget2d {
+            position: Vec2::new(70.0, 10.0),
+            crowding: 2,
+        };
+        let target_3d = SharkTarget3d {
+            position: Vec3::new(70.0, 10.0, 20.0),
+            crowding: 2,
+        };
+
+        assert_close(
+            shark_speed_for_target_2d(target_2d, config),
+            shark_speed_for_target_3d(target_3d, config),
         );
     }
 
@@ -758,6 +832,10 @@ mod tests {
         let SimulationState::TwoD(world) = &simulation.state else {
             panic!("simulation should remain in 2d");
         };
+        assert!(world.shark.velocity.x < 0.0);
+        assert!(world.shark.velocity.y < 0.0);
+        assert!(world.shark.position.x < 199.0);
+        assert!(world.shark.position.y < 119.0);
         assert!(world.shark.position.x >= 0.0);
         assert!(world.shark.position.x <= config.world_width);
         assert!(world.shark.position.y >= 0.0);
@@ -778,7 +856,10 @@ mod tests {
             config,
             state: SimulationState::TwoD(World2d {
                 fish: vec![fish_2d(30.0, 60.0)],
-                shark: shark_2d(0.0, 60.0),
+                shark: Shark2d {
+                    position: Vec2::new(0.0, 60.0),
+                    velocity: Vec2::new(config.shark_speed, 0.0),
+                },
                 shark_target: None,
             }),
             fish_eaten: 0,
@@ -920,6 +1001,37 @@ mod tests {
             panic!("simulation should remain in 3d");
         };
         assert!(world.shark_target.is_none());
+    }
+
+    #[test]
+    fn shark_search_turns_inward_near_3d_depth_edge() {
+        let mut config = test_config();
+        config.shark_scan_radius = 1.0;
+        config.shark_search_speed_multiplier = 1.0;
+        let mut simulation = Simulation {
+            config,
+            state: SimulationState::ThreeD(World3d {
+                fish: vec![fish_3d(100.0, 60.0, 50.0)],
+                shark: Shark3d {
+                    position: Vec3::new(100.0, 60.0, 99.0),
+                    velocity: Vec3::new(0.0, 0.0, 20.0),
+                },
+                shark_target: None,
+            }),
+            fish_eaten: 0,
+            fish_positions: Vec::new(),
+            elapsed_seconds: 0.0,
+        };
+
+        simulation.tick(1.0);
+
+        let SimulationState::ThreeD(world) = &simulation.state else {
+            panic!("simulation should remain in 3d");
+        };
+        assert!(world.shark.velocity.z < 0.0);
+        assert!(world.shark.position.z < 99.0);
+        assert!(world.shark.position.z >= 0.0);
+        assert!(world.shark.position.z <= config.world_depth);
     }
 
     #[test]
