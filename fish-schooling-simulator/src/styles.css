@@ -67,7 +67,12 @@ body {
   border-radius: 6px;
 }
 
-.speed-button {
+.view-mode-control {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.speed-button,
+.view-button {
   height: 32px;
   padding: 0;
   color: #d9fbf7;
@@ -80,15 +85,18 @@ body {
   cursor: pointer;
 }
 
-.speed-button:last-child {
+.speed-button:last-child,
+.view-button:last-child {
   border-right: 0;
 }
 
-.speed-button:hover {
+.speed-button:hover,
+.view-button:hover {
   background: rgba(94, 234, 212, 0.14);
 }
 
-.speed-button.is-active {
+.speed-button.is-active,
+.view-button.is-active {
   color: #062126;
   background: #5eead4;
 }
@@ -116,12 +124,20 @@ body {
 }
 
 .simulation-stage {
+  position: relative;
   min-width: 0;
   min-height: 0;
 }
 
-canvas {
+.simulation-canvas {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.simulation-canvas.is-hidden {
+  pointer-events: none;
+  visibility: hidden;
 }

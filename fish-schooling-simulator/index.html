@@ -27,6 +27,18 @@
           </div>
         </div>
 
+        <div class="control-group">
+          <span class="control-label">View</span>
+          <div class="segmented-control view-mode-control" role="group" aria-label="Simulation view">
+            <button class="view-button is-active" type="button" data-view-mode="2d" aria-pressed="true">
+              2D
+            </button>
+            <button class="view-button" type="button" data-view-mode="3d" aria-pressed="false">
+              3D
+            </button>
+          </div>
+        </div>
+
         <div class="stat-row">
           <span class="stat-label">Fish eaten</span>
           <span class="stat-value" id="fish-eaten">0</span>
@@ -44,7 +56,8 @@
       </aside>
 
       <main class="simulation-stage">
-        <canvas id="simulation" aria-label="Fish schooling simulation"></canvas>
+        <canvas id="simulation-2d" class="simulation-canvas" aria-label="2D fish schooling simulation"></canvas>
+        <canvas id="simulation-3d" class="simulation-canvas is-hidden" aria-label="3D fish schooling simulation"></canvas>
       </main>
     </div>
     <script type="module" src="/src/main.js"></script>
